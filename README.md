@@ -1,30 +1,64 @@
-# RestPocket
+<p align="center">
+  <img src="docs/images/logo.png" alt="RestPocket Logo" width="128" style="border-radius: 28px;" />
+</p>
 
-RestPocket is a self-contained HTTP client and Telegram Mini App. It lets you send REST requests, inspect responses, organize collections, and debug APIs directly from your phone through Telegram, or inside any desktop browser.
+<h1 align="center">RestPocket</h1>
 
-The server uses Telegram long polling by default. You can run it on your local machine or a home server without configuring public domains, reverse proxies, or SSL certificates.
+<p align="center">
+  <strong>Self-contained HTTP client and Telegram Mini App for testing, inspecting, and automating REST APIs on mobile and desktop.</strong>
+</p>
+
+<p align="center">
+  <a href="#screenshots">Screenshots</a> •
+  <a href="#capabilities">Capabilities</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#getting-started">Getting Started</a> •
+  <a href="#telegram-setup">Telegram Setup</a> •
+  <a href="LICENSE">License</a>
+</p>
+
+---
+
+## Screenshots
+
+### Desktop Interface
+![RestPocket Desktop Interface](docs/images/app_desktop.png)
+
+### Mobile Mini App & Webhook Catcher
+<p align="center">
+  <img src="docs/images/app_mobile.png" width="310" alt="RestPocket Mobile Mini App" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs/images/webhook_catcher.png" width="530" alt="RestPocket Webhook Catcher" />
+</p>
+
+### Visual Form-to-JSON Builder
+![RestPocket Request & Form Builder](docs/images/request_builder.png)
 
 ## Capabilities
 
-- HTTP request runner supporting GET, POST, PUT, PATCH, DELETE, HEAD, and OPTIONS.
-- High-resolution timing metrics measuring round-trip latency and payload transfer sizes.
-- Response viewer with formatted JSON tree view, search filter, raw text mode, and header tables.
-- Pre-seeded and custom request collections (HTTPBin, GitHub Public API, JSONPlaceholder).
-- Request history tracking with status codes and quick replay.
-- Environment variables support with `{{variableName}}` syntax for URLs, headers, and request bodies.
-- cURL command parser to import requests from copied curl strings.
-- Code snippet generator exporting to cURL, JavaScript Fetch, Python requests, and Go net/http.
-- Server-side request forgery (SSRF) guard blocking access to loopback, private subnets, and cloud metadata endpoints.
-- Full local development mode that mocks Telegram WebApp APIs when loaded outside the Telegram client.
+- **Multi-Method Request Dispatcher:** Execute GET, POST, PUT, PATCH, DELETE, HEAD, and OPTIONS with custom headers, queries, and bodies.
+- **Timing & Payload Telemetry:** High-resolution timing metrics measuring DNS, TLS, and round-trip latency alongside byte transfer sizes.
+- **Interactive JSON Tree & Filter:** Formatted JSON viewer with collapsible nodes, real-time key/value search filter, and raw text toggle.
+- **Dynamic Variable Replacement:** Built-in tokens like `{{$uuid}}`, `{{$timestamp}}`, `{{$randomInt}}`, and `{{$isoDate}}`, in addition to custom `{{variableName}}` environment tokens.
+- **1-Tap Response Chaining:** Extract values from response JSON keys and save them directly into environment variables without manual copying.
+- **Visual Form-to-JSON Builder:** Compose structured JSON bodies using key-value rows with type inference (string, number, boolean, null).
+- **Embedded Webhook Catcher (RequestBin):** Spin up temporary webhook capture URLs (`/api/bin/:binId`) to inspect incoming webhooks and callback payloads in real time.
+- **Automated Health Check Monitors:** Periodically ping critical endpoints and receive Telegram notifications on status regressions.
+- **Collections & Pre-seeded Workflows:** Organize requests into custom folders or load built-in templates (HTTPBin, GitHub Public API, JSONPlaceholder).
+- **Postman & cURL Interoperability:** Import requests from raw cURL commands, import/export collections in Postman v2.1 format.
+- **Multi-Language Code Export:** Generate instant client code for cURL, Fetch (JavaScript/TypeScript), Python `requests`, and Go `net/http`.
+- **SSRF Protection Guard:** Enforces validation against RFC 1918 private subnets, loopback interfaces, and cloud metadata services.
+- **Telegram Native Integration:** Runs as a Telegram Mini App with haptic feedback, theme synchronization, and inline query support (`@bot <url>`).
+- **Zero Public Setup Needed:** Communicates via Telegram long polling, allowing local machines and homelabs to operate without public IP addresses or certificates.
 
 ## Architecture
 
 RestPocket consists of two primary components:
 
-1. **Backend Server (`server/`):** Fastify server written in TypeScript. Dispatches HTTP requests through Undici, runs a grammY Telegram bot via long polling, manages SQLite persistence, and enforces SSRF restrictions.
-2. **Web Client (`web/`):** Single-page application built with React 19, Vite, and Tailwind CSS. Interfaces with the Telegram WebApp SDK to provide native haptic feedback and match Telegram color themes.
+1. **Backend Server (`server/`):** Fastify server written in TypeScript. Dispatches HTTP requests through Undici, runs a grammY Telegram bot via long polling, manages SQLite persistence, tracks background monitors, and enforces SSRF restrictions.
+2. **Web Client (`web/`):** Single-page application built with React 19, Vite, and Tailwind CSS. Interfaces with the Telegram WebApp SDK to provide native haptic feedback, matching color themes, and response inspection tools.
 
-More details on data flow and security controls are available in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+More details on data flow, database schemas, and security controls are available in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Getting Started
 
