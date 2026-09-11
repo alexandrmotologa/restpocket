@@ -10,7 +10,10 @@ import { seedDefaultCollections } from './db/seed.js';
 import { executeApiRoutes } from './routes/executeApi.js';
 import { collectionsApiRoutes } from './routes/collectionsApi.js';
 import { historyApiRoutes } from './routes/historyApi.js';
+import { webhookApiRoutes } from './routes/webhookApi.js';
+import { monitorsApiRoutes } from './routes/monitorsApi.js';
 import { initTelegramBot, stopTelegramBot } from './bot/bot.js';
+import { startMonitorService, stopMonitorService } from './services/monitorService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,6 +32,25 @@ async function startServer(): Promise<void> {
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Telegram-Init-Data'],
   });
 
+  // Support all media types for webhooks and raw requests
+  fastify.addContentTypeParser('*', { parseAs: 'buffer' }, (req, body, done) => {
+    try {
+      const text = body.toString('utf-8');
+      if (req.headers['content-type']?.includes('application/json')) {
+        try {
+          done(null, JSON.parse(text));
+          return;
+        } catch {
+          done(null, text);
+          return;
+        }
+      }
+      done(null, text);
+    } catch (err: any) {
+      done(err, undefined);
+    }
+  });
+
   // Initialize and seed database
   try {
     seedDefaultCollections();
@@ -41,6 +63,8 @@ async function startServer(): Promise<void> {
   await fastify.register(executeApiRoutes);
   await fastify.register(collectionsApiRoutes);
   await fastify.register(historyApiRoutes);
+  await fastify.register(webhookApiRoutes);
+  await fastify.register(monitorsApiRoutes);
 
   // Health check endpoint
   fastify.get('/api/health', async () => {
@@ -84,8 +108,9 @@ async function startServer(): Promise<void> {
     });
   }
 
-  // Initialize Telegram Bot
+  // Initialize Telegram Bot & Monitor Service
   initTelegramBot();
+  startMonitorService();
 
   // Start HTTP Server
   try {
@@ -99,6 +124,7 @@ async function startServer(): Promise<void> {
   // Graceful shutdown
   const shutdown = async () => {
     console.log('\nShutting down RestPocket server...');
+    stopMonitorService();
     stopTelegramBot();
     await fastify.close();
     process.exit(0);

@@ -69,6 +69,32 @@ function initSchema(db: DatabaseSync): void {
       is_active INTEGER DEFAULT 0,
       created_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS webhook_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      bin_id TEXT NOT NULL,
+      method TEXT NOT NULL,
+      path TEXT NOT NULL,
+      headers_json TEXT DEFAULT '{}',
+      query_json TEXT DEFAULT '{}',
+      body_raw TEXT,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS monitors (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id TEXT DEFAULT 'guest',
+      name TEXT NOT NULL,
+      method TEXT NOT NULL,
+      url TEXT NOT NULL,
+      interval_minutes INTEGER DEFAULT 15,
+      expected_status INTEGER DEFAULT 200,
+      last_status INTEGER,
+      last_latency_ms REAL,
+      last_checked_at TEXT,
+      is_active INTEGER DEFAULT 1,
+      created_at TEXT NOT NULL
+    );
   `);
 }
 
@@ -271,4 +297,139 @@ export const db = {
       created_at: now,
     };
   },
+
+  saveWebhookEvent(
+    binId: string,
+    method: string,
+    path: string,
+    headers: Record<string, any>,
+    query: Record<string, any>,
+    bodyRaw?: string
+  ): WebhookEventRecord {
+    const database = getDatabase();
+    const now = new Date().toISOString();
+    const headersJson = JSON.stringify(headers);
+    const queryJson = JSON.stringify(query);
+
+    const result = database
+      .prepare(`
+        INSERT INTO webhook_events (bin_id, method, path, headers_json, query_json, body_raw, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `)
+      .run(binId, method, path, headersJson, queryJson, bodyRaw || null, now);
+
+    return {
+      id: Number(result.lastInsertRowid),
+      bin_id: binId,
+      method,
+      path,
+      headers_json: headersJson,
+      query_json: queryJson,
+      body_raw: bodyRaw || null,
+      created_at: now,
+    };
+  },
+
+  getWebhookEvents(binId: string, limit = 50): WebhookEventRecord[] {
+    const database = getDatabase();
+    return database
+      .prepare('SELECT * FROM webhook_events WHERE bin_id = ? ORDER BY id DESC LIMIT ?')
+      .all(binId, limit) as any[];
+  },
+
+  clearWebhookEvents(binId: string): boolean {
+    const database = getDatabase();
+    const result = database.prepare('DELETE FROM webhook_events WHERE bin_id = ?').run(binId);
+    return Number(result.changes) > 0;
+  },
+
+  getMonitors(userId = 'guest'): MonitorRecord[] {
+    const database = getDatabase();
+    return database
+      .prepare('SELECT * FROM monitors WHERE user_id = ? ORDER BY id DESC')
+      .all(userId) as any[];
+  },
+
+  getAllActiveMonitors(): MonitorRecord[] {
+    const database = getDatabase();
+    return database
+      .prepare('SELECT * FROM monitors WHERE is_active = 1')
+      .all() as any[];
+  },
+
+  createMonitor(
+    userId: string,
+    name: string,
+    method: string,
+    url: string,
+    intervalMinutes = 15,
+    expectedStatus = 200
+  ): MonitorRecord {
+    const database = getDatabase();
+    const now = new Date().toISOString();
+    const result = database
+      .prepare(`
+        INSERT INTO monitors (user_id, name, method, url, interval_minutes, expected_status, is_active, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, 1, ?)
+      `)
+      .run(userId, name, method, url, intervalMinutes, expectedStatus, now);
+
+    return {
+      id: Number(result.lastInsertRowid),
+      user_id: userId,
+      name,
+      method,
+      url,
+      interval_minutes: intervalMinutes,
+      expected_status: expectedStatus,
+      last_status: null,
+      last_latency_ms: null,
+      last_checked_at: null,
+      is_active: 1,
+      created_at: now,
+    };
+  },
+
+  updateMonitorCheck(id: number, lastStatus: number, lastLatencyMs: number): void {
+    const database = getDatabase();
+    const now = new Date().toISOString();
+    database
+      .prepare('UPDATE monitors SET last_status = ?, last_latency_ms = ?, last_checked_at = ? WHERE id = ?')
+      .run(lastStatus, lastLatencyMs, now, id);
+  },
+
+  deleteMonitor(id: number, userId = 'guest'): boolean {
+    const database = getDatabase();
+    const result = database
+      .prepare('DELETE FROM monitors WHERE id = ? AND (user_id = ? OR user_id = \'guest\')')
+      .run(id, userId);
+    return Number(result.changes) > 0;
+  },
 };
+
+export interface WebhookEventRecord {
+  id: number;
+  bin_id: string;
+  method: string;
+  path: string;
+  headers_json: string;
+  query_json: string;
+  body_raw: string | null;
+  created_at: string;
+}
+
+export interface MonitorRecord {
+  id: number;
+  user_id: string;
+  name: string;
+  method: string;
+  url: string;
+  interval_minutes: number;
+  expected_status: number;
+  last_status: number | null;
+  last_latency_ms: number | null;
+  last_checked_at: string | null;
+  is_active: number;
+  created_at: string;
+}
+

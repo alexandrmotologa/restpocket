@@ -1,0 +1,15 @@
+{
+  "name": "restpocket-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RestPocket — Standalone HTTP/REST Client and Telegram Mini App",
+  "scripts": {
+    "dev:server": "npm --prefix server run dev",
+    "dev:web": "npm --prefix web run dev",
+    "build:server": "npm --prefix server run build",
+    "build:web": "npm --prefix web run build",
+    "build": "npm run build:web && npm run build:server",
+    "test:server": "npm --prefix server test",
+    "start": "node server/dist/index.js"
+  }
+}
