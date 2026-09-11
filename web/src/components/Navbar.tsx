@@ -41,9 +41,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-30 bg-[#0f172a]/95 backdrop-blur border-b border-slate-800 px-3 py-2.5 flex items-center justify-between">
       {/* Brand & Logo */}
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
-          <Zap className="w-4 h-4 text-white fill-white" />
-        </div>
+        <img src="/logo.svg" alt="RestPocket" className="w-8 h-8 rounded-lg shadow-md shadow-sky-500/20" />
         <div>
           <div className="flex items-center gap-1.5">
             <span className="font-bold text-sm tracking-tight text-white">RestPocket</span>
