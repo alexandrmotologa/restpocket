@@ -1,14 +1,25 @@
 <p align="center">
-  <img src="docs/images/logo.png" alt="RestPocket Logo" width="128" style="border-radius: 28px;" />
+  <img src="docs/images/logo.png?raw=true" alt="RestPocket Logo" width="130" style="border-radius: 24px;" />
 </p>
 
 <h1 align="center">RestPocket</h1>
+
+<p align="center">
+  <a href="https://github.com/alexandrmotologa/restpocket/actions"><img src="https://github.com/alexandrmotologa/restpocket/actions/workflows/ci.yml/badge.svg" alt="CI Build Status" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-22%2B-green.svg" alt="Node.js 22+" /></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.7-3178c6.svg" alt="TypeScript" /></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19-61dafb.svg" alt="React 19" /></a>
+  <a href="https://fastify.dev/"><img src="https://img.shields.io/badge/Fastify-5.2-black.svg" alt="Fastify" /></a>
+  <a href="https://core.telegram.org/bots"><img src="https://img.shields.io/badge/Telegram-Mini%20App%20%2B%20Bot-blue.svg" alt="Telegram Mini App & Bot" /></a>
+</p>
 
 <p align="center">
   <strong>Self-contained HTTP client and Telegram Mini App for testing, inspecting, and automating REST APIs on mobile and desktop.</strong>
 </p>
 
 <p align="center">
+  <a href="#demo">Live Demo</a> •
   <a href="#screenshots">Screenshots</a> •
   <a href="#capabilities">Capabilities</a> •
   <a href="#architecture">Architecture</a> •
@@ -19,20 +30,28 @@
 
 ---
 
+## Demo
+
+<p align="center">
+  <img src="docs/images/restpocket_demo.gif?raw=true" alt="RestPocket Live Interactive Demo" width="880" />
+</p>
+
+---
+
 ## Screenshots
 
 ### Desktop Interface
-![RestPocket Desktop Interface](docs/images/app_desktop.png)
+![RestPocket Desktop Interface](docs/images/app_desktop.png?raw=true)
 
 ### Mobile Mini App & Webhook Catcher
 <p align="center">
-  <img src="docs/images/app_mobile.png" width="310" alt="RestPocket Mobile Mini App" />
+  <img src="docs/images/app_mobile.png?raw=true" width="310" alt="RestPocket Mobile Mini App" />
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="docs/images/webhook_catcher.png" width="530" alt="RestPocket Webhook Catcher" />
+  <img src="docs/images/webhook_catcher.png?raw=true" width="530" alt="RestPocket Webhook Catcher" />
 </p>
 
 ### Visual Form-to-JSON Builder
-![RestPocket Request & Form Builder](docs/images/request_builder.png)
+![RestPocket Request & Form Builder](docs/images/request_builder.png?raw=true)
 
 ## Capabilities
 
